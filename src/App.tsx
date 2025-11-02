@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   addEdge,
@@ -92,7 +92,26 @@ function App() {
     [setEdges]
   );
 
-  // Calculate temperatures whenever nodes or edges change
+  // Create a stable key that changes when relevant node/edge data changes
+  const thermalNetworkKey = useMemo(() => {
+    const nodeData = nodes.map(n => ({
+      id: n.id,
+      type: n.type,
+      ...(n.type === 'bath' ? { temp: (n.data as BathNodeData).temperature } : {}),
+      ...(n.type === 'thermalMass' ? { 
+        cap: (n.data as ThermalMassNodeData).heatCapacity,
+        power: (n.data as ThermalMassNodeData).power 
+      } : {})
+    }));
+    const edgeData = edges.map(e => ({
+      source: e.source,
+      target: e.target,
+      conductance: (e.data as ConductanceEdgeData)?.conductance
+    }));
+    return JSON.stringify({ nodes: nodeData, edges: edgeData });
+  }, [nodes, edges]);
+
+  // Calculate temperatures whenever the thermal network changes
   useEffect(() => {
     const temperatures = calculateSteadyStateTemperatures(nodes, edges);
     
@@ -110,11 +129,7 @@ function App() {
         return node;
       })
     );
-    // We intentionally use only length as dependency to avoid infinite loops
-    // The full nodes/edges objects change on every render, but we only need to
-    // recalculate when the structure changes (nodes/edges added or removed)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes.length, edges.length, setNodes]);
+  }, [thermalNetworkKey, nodes, edges, setNodes]);
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     setSelectedNode(node);

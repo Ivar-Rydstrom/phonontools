@@ -1,6 +1,8 @@
 import type { Node, Edge } from '@xyflow/react';
 import type { ThermalMassNodeData, BathNodeData, ConductanceEdgeData } from './types';
 
+const DEFAULT_CONDUCTANCE = 1; // W/K - default thermal conductance when not specified
+
 /**
  * Calculates steady-state temperatures for a thermal chain
  * Uses iterative relaxation method to solve the thermal network
@@ -25,7 +27,7 @@ export function calculateSteadyStateTemperatures(
   // Build adjacency list for thermal network
   const connections = new Map<string, Array<{ nodeId: string; conductance: number }>>();
   edges.forEach(edge => {
-    const conductance = (edge.data as ConductanceEdgeData)?.conductance || 1;
+    const conductance = (edge.data as ConductanceEdgeData)?.conductance || DEFAULT_CONDUCTANCE;
     
     if (!connections.has(edge.source)) {
       connections.set(edge.source, []);
