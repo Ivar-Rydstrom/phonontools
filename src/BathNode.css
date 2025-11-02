@@ -1,0 +1,30 @@
+.bath-node {
+  padding: 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid #5a67d8;
+  min-width: 120px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.bath-node.selected {
+  border-color: #4c51bf;
+  box-shadow: 0 0 0 2px rgba(90, 103, 216, 0.4);
+}
+
+.bath-node .node-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bath-node .node-label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.bath-node .node-temp {
+  font-size: 13px;
+  font-weight: 600;
+}
